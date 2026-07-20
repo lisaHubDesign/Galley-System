@@ -126,13 +126,9 @@ export function generateWordHtml(state: ArticleState): string {
       return tblHtml;
     };
 
-    // Paragraphs - indented dynamic style to match PDF template
+    // Paragraphs - fully justified without indentation to match PDF template
     sec.paragraphs.forEach((p, pIdx) => {
-      const isListItem = /^\s*(\(\d+\)|\(\w+\)|\[\d+\]|\d+\.\s+)/.test(p);
-      const textIndentValue = isListItem ? '0' : (pIdx === 0 ? '0' : '0.25in');
-      const paddingLeftValue = isListItem ? '0.25in' : '0';
-
-      sectionsHtml += `<p style="font-family:'Times New Roman', serif; text-align:justify; text-indent:${textIndentValue}; padding-left:${paddingLeftValue}; font-size:11pt; margin:0 0 6pt; line-height:1.25; color:#000000;">${esc(p)}</p>`;
+      sectionsHtml += `<p style="font-family:'Times New Roman', serif; text-align:justify; font-size:11pt; margin:0 0 8pt; line-height:1.25; color:#000000;">${esc(p)}</p>`;
 
       // Interleaved Figures: if referenced in this paragraph
       sec.figures.forEach((fig) => {
@@ -227,7 +223,7 @@ body { font-family: 'Times New Roman', serif; font-size: 11pt; color:#000000; }
   <p style="font-family:'Times New Roman', serif; text-align:center; font-size:10.5pt; margin:0 0 16pt; color:#444444;">${esc(state.affiliation)}</p>
   
   <!-- Keywords and Abstract Area (Keywords first, Abstract second, no italicized abstract body, fully justified) -->
-  <div style="margin:16pt 0.3in; text-align:justify;">
+  <div style="margin:16pt 0.5in; text-align:justify;">
     ${state.keywords ? `<p style="font-family:'Times New Roman', serif; font-size:10pt; line-height:1.3; margin:0 0 6pt;"><b>Keywords:</b> ${esc(state.keywords)}</p>` : ''}
     ${state.abstract ? `<p style="font-family:'Times New Roman', serif; font-size:10pt; line-height:1.3; margin:0;"><b>Abstract.</b> ${esc(state.abstract)}</p>` : ''}
   </div>
@@ -238,13 +234,13 @@ body { font-family: 'Times New Roman', serif; font-size: 11pt; color:#000000; }
   <!-- References -->
   ${
     state.referencesText.trim()
-      ? `<p style="font-family:'Times New Roman', serif; font-weight:bold; font-size:12.5pt; margin:22pt 0 6pt; border-top:0.5pt solid #cccccc; padding-top:10px;">References</p>` +
+      ? `<p style="font-family:'Times New Roman', serif; font-weight:bold; font-size:12.5pt; margin:22pt 0 6pt;">References</p>` +
         state.referencesText
           .split('\n')
           .filter(Boolean)
           .map((r, i) => {
             const cleaned = r.replace(/^\[?\d+\]\.?\s*/, '').trim();
-            return `<p style="font-family:'Times New Roman', serif; font-size:9.5pt; margin:0 0 4pt; text-indent:-0.3in; margin-left:0.3in; text-align:justify;">[${i + 1}]. ${esc(cleaned)}</p>`;
+            return `<p style="font-family:'Times New Roman', serif; font-size:9.5pt; margin:0 0 6pt; text-align:justify;">[${i + 1}]. ${esc(cleaned)}</p>`;
           })
           .join('')
       : ''

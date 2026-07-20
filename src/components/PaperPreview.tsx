@@ -60,34 +60,32 @@ export default function PaperPreview({ article }: PaperPreviewProps) {
       {/* Actual Paper Sheet Container */}
       <div id="paperPreview" className="paper-page bg-paper text-ink p-14 relative shadow-2xl rounded-sm font-serif max-w-full text-zinc-900" style={{ fontFamily: "'Times New Roman', Times, serif" }}>
         {/* Masthead matching Atlantis Press layout exactly */}
-        <div className="select-none mb-8 border-b border-zinc-200/40 pb-3">
-          <div className="flex justify-between items-start">
-            {/* Left: Atlantis Press Logo */}
-            <div className="flex items-center gap-1.5">
-              <svg viewBox="0 0 120 120" className="h-10 w-10 text-zinc-900 fill-current shrink-0">
-                <path d="M45.5,108.5 C40,108.5 35,105 31.5,100 C25,90.5 24,78.5 29.5,66.5 C34.5,55.5 45.5,43.5 56.5,33.5 C59.5,31 62.5,28 65,25.5 C66.5,24 68.5,22.5 70,22.5 C71.5,22.5 72,23.5 72,25 C72.5,30.5 70.5,37 67,43.5 C62.5,52 56,61 49.5,69.5 C46,74 42.5,78 40.5,82 C39,85 39,87.5 40.5,89 C42,90.5 44.5,90.5 47.5,89 C51.5,87 56,83.5 61,79 C68,72.5 75.5,65 82.5,57 C85.5,53.5 88.5,50 91,47 C92.5,45.5 94,44.5 95,44.5 C96,44.5 96.5,45.5 96.5,47 C96.5,52.5 93.5,59.5 88.5,67 C82.5,76 74.5,85 66.5,93 C61.5,98 56.5,102.5 52,105.5 C49.5,107.5 47.5,108.5 45.5,108.5 Z" />
-                <path d="M72.5,20.5 C74.5,20.5 76.5,22.5 76.5,25.5 C76.5,29.5 73.5,34.5 68.5,38.5 C66.5,40 64.5,40.5 63.5,39.5 C62.5,38.5 63,36 64.5,33.5 C67.5,28.5 70.5,22.5 72.5,20.5 Z" />
-              </svg>
-              <div className="flex flex-col text-left text-zinc-900 leading-none">
-                <span className="font-extrabold text-[12px] tracking-[0.08em] font-sans">ATLANTIS</span>
-                <span className="font-bold text-[9.5px] tracking-[0.25em] mt-0.5 pl-[1px] font-sans">PRESS</span>
-              </div>
+        <div className="relative select-none mb-10 pb-4 min-h-[3.25rem] flex flex-col items-center justify-center">
+          {/* Logo on the far left (absolute positioned to not affect centering) */}
+          <div className="absolute left-0 top-0 flex items-center gap-1.5">
+            <svg viewBox="0 0 120 120" className="h-10 w-10 text-zinc-900 fill-current shrink-0">
+              <path d="M45.5,108.5 C40,108.5 35,105 31.5,100 C25,90.5 24,78.5 29.5,66.5 C34.5,55.5 45.5,43.5 56.5,33.5 C59.5,31 62.5,28 65,25.5 C66.5,24 68.5,22.5 70,22.5 C71.5,22.5 72,23.5 72,25 C72.5,30.5 70.5,37 67,43.5 C62.5,52 56,61 49.5,69.5 C46,74 42.5,78 40.5,82 C39,85 39,87.5 40.5,89 C42,90.5 44.5,90.5 47.5,89 C51.5,87 56,83.5 61,79 C68,72.5 75.5,65 82.5,57 C85.5,53.5 88.5,50 91,47 C92.5,45.5 94,44.5 95,44.5 C96,44.5 96.5,45.5 96.5,47 C96.5,52.5 93.5,59.5 88.5,67 C82.5,76 74.5,85 66.5,93 C61.5,98 56.5,102.5 52,105.5 C49.5,107.5 47.5,108.5 45.5,108.5 Z" />
+              <path d="M72.5,20.5 C74.5,20.5 76.5,22.5 76.5,25.5 C76.5,29.5 73.5,34.5 68.5,38.5 C66.5,40 64.5,40.5 63.5,39.5 C62.5,38.5 63,36 64.5,33.5 C67.5,28.5 70.5,22.5 72.5,20.5 Z" />
+            </svg>
+            <div className="flex flex-col text-left text-zinc-900 leading-none">
+              <span className="font-extrabold text-[12px] tracking-[0.08em] font-sans">ATLANTIS</span>
+              <span className="font-bold text-[9.5px] tracking-[0.25em] mt-0.5 pl-[1px] font-sans">PRESS</span>
             </div>
+          </div>
 
-            {/* Right: ACSR Journal name and volume */}
+          {/* Centered Journal and Conference details */}
+          <div className="text-center max-w-[70%] mx-auto flex flex-col items-center">
             {journalLine && (
-              <div className="text-right text-zinc-900 italic text-[11.5px] leading-tight font-medium pt-1 max-w-[65%]">
+              <div className="text-zinc-900 italic text-[11px] leading-tight font-medium">
                 {journalLine}
               </div>
             )}
+            {article.conferenceLine && (
+              <div className="text-[10px] leading-tight font-normal text-zinc-800 mt-1.5 max-w-[95%]">
+                {article.conferenceLine}
+              </div>
+            )}
           </div>
-
-          {/* Center: Conference Title */}
-          {article.conferenceLine && (
-            <div className="text-center text-[10.5px] leading-tight font-normal text-zinc-800 mt-2.5 max-w-[90%] mx-auto">
-              {article.conferenceLine}
-            </div>
-          )}
         </div>
 
         {/* Article Title */}
@@ -105,8 +103,8 @@ export default function PaperPreview({ article }: PaperPreviewProps) {
           {article.affiliation || 'Department, University, City, Country'}
         </div>
 
-        {/* Keywords and Abstract Area (Aligned with body text, keywords first, abstract second, regular text, fully justified) */}
-        <div className="space-y-3 mb-6 text-[12px] leading-relaxed text-zinc-900 text-justify">
+        {/* Keywords and Abstract Area (Indented on both sides, keywords first, abstract second, regular text, fully justified) */}
+        <div className="mx-[0.5in] space-y-3 mb-8 text-[11.5px] leading-[1.4] text-zinc-900 text-justify">
           {article.keywords && (
             <div>
               <span className="font-bold mr-1.5">Keywords:</span>
@@ -249,18 +247,11 @@ export default function PaperPreview({ article }: PaperPreviewProps) {
                   </h2>
                 )}
 
-                {/* Paragraphs fully justified with dynamic first-line indent & block hanging indent for lists */}
+                {/* Paragraphs fully justified to match the PDF template without indentation */}
                 {sec.paragraphs.map((p, pIdx) => {
-                  const isListItem = /^\s*(\(\d+\)|\(\w+\)|\[\d+\]|\d+\.\s+)/.test(p);
-                  const textIndentValue = isListItem ? '0' : (pIdx === 0 ? '0' : '0.25in');
-                  const paddingLeftValue = isListItem ? '0.25in' : '0';
-
                   return (
                     <React.Fragment key={pIdx}>
-                      <p
-                        className="text-[13px] leading-relaxed text-justify text-zinc-900 mb-2"
-                        style={{ textIndent: textIndentValue, paddingLeft: paddingLeftValue }}
-                      >
+                      <p className="text-[12.5px] leading-[1.45] text-justify text-zinc-900 mb-3 select-none">
                         {p}
                       </p>
 
@@ -310,16 +301,16 @@ export default function PaperPreview({ article }: PaperPreviewProps) {
 
         {/* References List */}
         {article.referencesText.trim() && (
-          <div className="mt-8 pt-4 border-t border-zinc-300/60 break-inside-avoid-page">
+          <div className="mt-10 break-inside-avoid-page">
             <h3 className="font-bold text-[14.5px] text-zinc-900 mb-3">
               References
             </h3>
-            <div className="space-y-2 font-serif text-[11.5px] leading-relaxed">
+            <div className="space-y-2 font-serif text-[11px] leading-relaxed">
               {article.referencesText.split('\n').filter(Boolean).map((ref, idx) => {
                 const cleaned = ref.replace(/^\[?\d+\]\.?\s*/, '').trim();
                 return (
-                  <div key={idx} className="pl-8 -indent-8 text-justify text-zinc-900">
-                    <span className="font-bold mr-2">[{idx + 1}].</span>
+                  <div key={idx} className="text-justify text-zinc-900">
+                    <span className="mr-1.5">[{idx + 1}].</span>
                     <span>{cleaned}</span>
                   </div>
                 );
@@ -328,14 +319,14 @@ export default function PaperPreview({ article }: PaperPreviewProps) {
           </div>
         )}
 
-        {/* Footer Area matching Page 1 of the template exactly */}
-        <div className="mt-16 pt-3 font-serif text-[10px] text-zinc-800 select-none border-t border-zinc-300/30">
-          <div className="flex justify-between items-baseline mb-1">
-            <span>Copyright © {article.copyrightYear}, the Authors. Published by {article.publisher}.</span>
-            <span className="font-mono text-xs font-semibold">{article.startPageNumber || '1222'}</span>
+        {/* Footer Area matching Page 1 of the template exactly (no horizontal line) */}
+        <div className="mt-16 pt-4 font-serif text-[10px] text-zinc-800 select-none flex justify-between items-end">
+          <div className="space-y-1 text-[9.5px] leading-normal text-zinc-700 flex-1">
+            <div>Copyright © {article.copyrightYear}, the Authors. Published by {article.publisher}.</div>
+            <div>{article.licenseLine}</div>
           </div>
-          <div className="text-center text-[9px] text-zinc-500 leading-relaxed">
-            {article.licenseLine}
+          <div className="text-right shrink-0 pl-4">
+            <span className="text-[11.5px] text-zinc-800">{article.startPageNumber || '1222'}</span>
           </div>
         </div>
       </div>
