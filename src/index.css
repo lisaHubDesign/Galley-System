@@ -39,16 +39,55 @@
 
 /* Print layout optimizations for PDF export */
 @media print {
-  body {
+  /* Reset standard document root settings */
+  html, body, #root {
     background: white !important;
+    background-color: white !important;
     color: black !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    font-family: 'Times New Roman', Times, serif !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
-  .no-print {
+
+  /* Hide any utility/control UI */
+  .no-print,
+  header,
+  .topbar,
+  .no-print * {
     display: none !important;
   }
+
+  /* Reset all parent container layouts so they don't clip the printed page */
+  main, 
+  div.grid, 
+  div.lg\:col-span-12,
+  div.lg\:col-span-7,
+  div.h-\[calc\(100vh-69px\)\],
+  div.overflow-y-auto {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    position: static !important;
+    background: white !important;
+    background-color: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  /* Standard print helper class */
   .print-only {
     display: block !important;
   }
+
+  /* Force paper-page to standard academic styling on paper */
   .paper-page {
     box-shadow: none !important;
     border: none !important;
@@ -58,7 +97,16 @@
     color: black !important;
     width: 100% !important;
     max-width: 100% !important;
+    overflow: visible !important;
+    display: block !important;
   }
+
+  /* Custom Page Margin Settings for A4 Portrait standard academic printing */
+  @page {
+    size: A4 portrait;
+    margin: 1.5cm;
+  }
+
   /* Force page breaks where appropriate */
   .page-break-before {
     page-break-before: always;

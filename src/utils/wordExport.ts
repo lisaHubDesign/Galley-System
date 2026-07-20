@@ -126,9 +126,11 @@ export function generateWordHtml(state: ArticleState): string {
       return tblHtml;
     };
 
-    // Paragraphs - fully justified without indentation to match PDF template
+    // Paragraphs - fully justified with first-paragraph-no-indent rule to match PDF template
     sec.paragraphs.forEach((p, pIdx) => {
-      sectionsHtml += `<p style="font-family:'Times New Roman', serif; text-align:justify; font-size:11pt; margin:0 0 8pt; line-height:1.25; color:#000000;">${esc(p)}</p>`;
+      const isFirstParagraph = pIdx === 0;
+      const indentStyle = isFirstParagraph ? '' : 'text-indent: 0.25in;';
+      sectionsHtml += `<p style="font-family:'Times New Roman', serif; text-align:justify; font-size:11pt; margin:0 0 8pt; line-height:1.25; color:#000000; ${indentStyle}">${esc(p)}</p>`;
 
       // Interleaved Figures: if referenced in this paragraph
       sec.figures.forEach((fig) => {

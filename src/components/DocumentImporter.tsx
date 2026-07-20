@@ -24,9 +24,18 @@ export default function DocumentImporter({ onImportComplete }: DocumentImporterP
       }
       const script = document.createElement('script');
       script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js';
-      script.onload = () => {
+      script.onload = async () => {
         const pdfjs = (window as any).pdfjsLib;
-        pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js';
+        try {
+          // Fetch and load worker via a local Blob URL to bypass iframe/sandbox CORS constraints
+          const response = await fetch('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js');
+          const workerCode = await response.text();
+          const blob = new Blob([workerCode], { type: 'application/javascript' });
+          pdfjs.GlobalWorkerOptions.workerSrc = URL.createObjectURL(blob);
+        } catch (e) {
+          console.warn('Failed to load PDF worker via Blob URL, falling back to direct CDN:', e);
+          pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js';
+        }
         resolve(pdfjs);
       };
       script.onerror = () => reject(new Error('Failed to load PDF.js library.'));
@@ -36,16 +45,107 @@ export default function DocumentImporter({ onImportComplete }: DocumentImporterP
 
   const extractPdfText = async (arrayBuffer: ArrayBuffer, pdfjs: any): Promise<string> => {
     const pdf = await pdfjs.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
-    const blocks: string[] = [];
+    const allPagesText: string[] = [];
 
     for (let p = 1; p <= pdf.numPages; p++) {
       const page = await pdf.getPage(p);
       const textContent = await page.getTextContent();
-      const pageText = textContent.items.map((it: any) => it.str).join(' ');
-      blocks.push(pageText);
+      
+      interface PdfTextItem {
+        str: string;
+        x: number;
+        y: number;
+        fontSize: number;
+      }
+      
+      const items: PdfTextItem[] = [];
+      for (const it of textContent.items) {
+        if (!it || typeof it.str !== 'string') continue;
+        let x = 0;
+        let y = 0;
+        let fontSize = 10;
+        if (it.transform && Array.isArray(it.transform) && it.transform.length >= 6) {
+          x = it.transform[4];
+          y = it.transform[5];
+          fontSize = Math.abs(it.transform[3]) || Math.abs(it.transform[0]) || 10;
+        }
+        items.push({ str: it.str, x, y, fontSize });
+      }
+
+      if (items.length === 0) continue;
+
+      // Group items into visual lines based on Y coordinate similarity
+      const lines: { y: number; items: PdfTextItem[] }[] = [];
+      for (const item of items) {
+        let foundLine = lines.find(l => Math.abs(l.y - item.y) < Math.max(item.fontSize * 0.45, 4.5));
+        if (foundLine) {
+          foundLine.items.push(item);
+        } else {
+          lines.push({ y: item.y, items: [item] });
+        }
+      }
+
+      // Sort lines by Y descending (top-to-bottom of the page)
+      lines.sort((a, b) => b.y - a.y);
+
+      interface LineInfo {
+        text: string;
+        y: number;
+        fontSize: number;
+      }
+      const lineInfos: LineInfo[] = [];
+
+      for (const line of lines) {
+        // Sort items in this line by X coordinate ascending (left-to-right)
+        line.items.sort((a, b) => a.x - b.x);
+
+        let lineText = '';
+        for (let idx = 0; idx < line.items.length; idx++) {
+          const item = line.items[idx];
+          if (idx > 0) {
+            const prev = line.items[idx - 1];
+            // If there's a visible gap between words, add a space
+            const gap = item.x - (prev.x + prev.str.length * (prev.fontSize * 0.42));
+            if (gap > 2) {
+              lineText += ' ';
+            }
+          }
+          lineText += item.str;
+        }
+
+        lineText = lineText.replace(/\s+/g, ' ').trim();
+        if (lineText) {
+          const avgFontSize = line.items.reduce((sum, it) => sum + it.fontSize, 0) / line.items.length;
+          lineInfos.push({
+            text: lineText,
+            y: line.y,
+            fontSize: avgFontSize
+          });
+        }
+      }
+
+      // Reconstruct paragraphs on this page by checking vertical gaps between consecutive lines
+      const pageBlocks: string[] = [];
+      for (let idx = 0; idx < lineInfos.length; idx++) {
+        const cur = lineInfos[idx];
+        pageBlocks.push(cur.text);
+
+        if (idx < lineInfos.length - 1) {
+          const next = lineInfos[idx + 1];
+          const gap = cur.y - next.y;
+          // If the gap is significantly larger than normal line height (e.g. 1.5 times font size),
+          // insert an empty line to signal a block/paragraph break.
+          if (gap > cur.fontSize * 1.55) {
+            pageBlocks.push('');
+          }
+        }
+      }
+
+      allPagesText.push(pageBlocks.join('\n'));
     }
 
-    return blocks.join('\n\n');
+    // Join pages with two blank lines
+    return allPagesText.join('\n\n\n');
   };
 
   const processFile = async (file: File) => {

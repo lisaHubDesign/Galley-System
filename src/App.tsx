@@ -22,7 +22,8 @@ import {
   ArrowDown,
   Plus,
   Trash2,
-  Info
+  Info,
+  Printer
 } from 'lucide-react';
 
 // Static Academic ACSR Proceedings Example
@@ -308,6 +309,13 @@ export default function App() {
             className="flex items-center gap-1.5 px-3 py-1.5 bg-chrome-panel hover:bg-chrome/80 border border-line rounded text-xs text-paper transition font-medium"
           >
             Clear All
+          </button>
+          <button
+            onClick={() => window.print()}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-chrome-panel hover:bg-chrome/80 border border-line rounded text-xs text-paper transition font-medium"
+            title="Generate print-ready academic PDF with standard styles"
+          >
+            <Printer className="h-3.5 w-3.5 text-muted" /> Print-Ready PDF
           </button>
           <button
             onClick={handleExportWord}
