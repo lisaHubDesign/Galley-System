@@ -1,0 +1,6 @@
+{
+  "name": "Galley System",
+  "description": "Academic paper proofing and galley generation system following Atlantis Press and ACSR publication standards.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
